@@ -18,17 +18,24 @@
 }
 
 #container {
+  width: 700px;
+  padding: 50px;
+
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 
   color: #f8f6f0;
+
+  border: 0.0000001px dashed white;
+  border-radius: 5px;
 }
 
 #questioner {
   height: 100px;
   width: 100%;
+  position: relative;
 
   display: flex;
   flex-direction: column;
@@ -37,24 +44,36 @@
 
   margin-bottom: 50px;
 }
-
 #score {
+  position: absolute;
+  top: 0;
+  left: 0;
+
   align-self: flex-start;
 }
-
 .question {
+  position: absolute;
+  top: 25px;
+  left: 0;
   font-size: 25px;
   font-family: "open sans";
 }
 
+#questionee {
+  width: 100%;
+
+  display: flex;
+  justify-content: space-around;
+}
+
 .button {
-  margin: 0px 3px;
+  /* margin: 0px 10px; */
   padding: 10px 20px;
 
   border: none;
   border-radius: 10px;
   background-color: #f4bb07;
-  text-shadow: 0px 0px 1px lightslategray;
+  text-shadow: 0px 0px 5px rgb(0, 0, 0);
 
   color: #f8f6f0;
   font-family: poppins;
