@@ -1,6 +1,8 @@
 import Questions from "./Questions";
 import Button from "./Button";
-import { useState, useEffect } from "react";
+import Timer from "./Timer";
+import { useState, useEffect, useRef } from "react";
+import TableRow from "./TableRow";
 
 let QA = [
   [`In California, you can’t legally buy a mousetrap without having what`, `A hunting license`],
@@ -110,6 +112,12 @@ function UI() {
   let [currentScore, setNewScore] = useState(0);
   let [questionObj, setQuestionObj] = useState(undefined);
   let [clickedOrNot, setClickedState] = useState(false);
+  let [currentTimer, setTimer] = useState(5);
+  let [questionCount, setQuestionCount] = useState(1);
+  let [qaStorage, setQAStorage] = useState({});
+
+  let timer = useRef();
+  let timeOut = useRef();
 
   useEffect(() => {
     let randomIdx = Math.floor(Math.random() * 100);
@@ -127,6 +135,33 @@ function UI() {
     setRandomQuestionIdx(randomIdx);
     populateTheObj(randomIdx);
   }, []);
+
+  useEffect(() => {
+    if (questionCount < 10) {
+      // eslint-disable-next-line
+      timer.current = setInterval(() => {
+        if (currentTimer > 0) setTimer((currentTimer) => currentTimer - 0.1);
+      }, 100);
+      // eslint-disable-next-line
+      timeOut.current = setTimeout(() => {
+        clearInterval(timer);
+        setClickedState(true);
+        getRandomQuestion();
+        setQAStorage({ ...qaStorage, [questionCount]: [false, "Unanswered", QA[questionIdx][1]] });
+      }, 5095);
+    }
+
+    return () => {
+      clearInterval(timer.current);
+      clearTimeout(timeOut.current);
+      setTimer(5);
+      setClickedState(() => false);
+    };
+  }, [questionIdx]);
+
+  useEffect(() => {
+    localStorage.setItem("qaStorage", JSON.stringify(qaStorage));
+  }, [qaStorage]);
 
   function populateTheObj(correctIndex) {
     let newObj = {
@@ -156,44 +191,74 @@ function UI() {
       }
     });
 
-    setQuestionObj(newObj);
+    setQuestionObj(() => newObj);
   }
 
   function getRandomQuestion() {
-    let randomIdx = Math.floor(Math.random() * 100);
-    setRandomQuestionIdx(randomIdx);
-    populateTheObj(randomIdx);
+    setQuestionCount((questionCount) => questionCount + 1);
+    if (questionCount < 10) {
+      let randomIdx = Math.floor(Math.random() * 100);
+      setRandomQuestionIdx(randomIdx);
+      populateTheObj(randomIdx);
+    } else {
+      console.log("done", questionCount);
+    }
   }
 
   let updateUserSelection = (i) => {
     if (!clickedOrNot) {
+      clearInterval(timer.current);
+      clearTimeout(timeOut.current);
+
       setClickedState(true);
       setSelected(i);
-      if (questionObj.options[i].isCorrect) setNewScore(currentScore + 1);
+      if (questionObj.options[i].isCorrect && currentTimer > 0) {
+        setNewScore((currentScore) => currentScore + 1);
+        setQAStorage({ ...qaStorage, [questionCount]: [true, questionObj.options[i].text, QA[questionIdx][1]] });
+      } else if (!questionObj.options[i].isCorrect && currentTimer > 0) {
+        setQAStorage({ ...qaStorage, [questionCount]: [false, questionObj.options[i].text, QA[questionIdx][1]] });
+      }
 
       setTimeout(() => {
-        setSelected(null);
+        setSelected(() => null);
         getRandomQuestion();
-        setClickedState(false);
-      }, 3000);
+      }, 1000);
     }
   };
 
   return (
     <div id="container">
-      {questionIdx !== null && questionObj !== undefined ? (
+      {questionIdx !== null && questionObj !== undefined && questionCount <= 10 ? (
         <>
           <div id="questioner">
             <div id="score">Score: {currentScore}</div>
             <Questions text={questionObj.question} />
           </div>
           <div id="questionee">
-            <Button bgColor={currentSelected === 0 ? (questionObj.options[0].isCorrect ? "green" : "red") : null} handleClick={updateUserSelection} idx={0} text={questionObj.options[0].text} clickedState={clickedOrNot ? "none" : ""} />
-            <Button bgColor={currentSelected === 1 ? (questionObj.options[1].isCorrect ? "green" : "red") : null} handleClick={updateUserSelection} idx={1} text={questionObj.options[1].text} clickedState={clickedOrNot ? "none" : ""} />
-            <Button bgColor={currentSelected === 2 ? (questionObj.options[2].isCorrect ? "green" : "red") : null} handleClick={updateUserSelection} idx={2} text={questionObj.options[2].text} clickedState={clickedOrNot ? "none" : ""} />
-            <Button bgColor={currentSelected === 3 ? (questionObj.options[3].isCorrect ? "green" : "red") : null} handleClick={updateUserSelection} idx={3} text={questionObj.options[3].text} clickedState={clickedOrNot ? "none" : ""} />
+            <Button bgColor={currentSelected === 0 ? (questionObj.options[0].isCorrect ? "green" : "red") : null} handleClick={updateUserSelection} idx={0} text={questionObj.options[0].text} clickedState={clickedOrNot ? "none" : ""} completed={currentSelected === 0 ? (questionObj.options[0].isCorrect ? true : false) : null} />
+            <Button bgColor={currentSelected === 1 ? (questionObj.options[1].isCorrect ? "green" : "red") : null} handleClick={updateUserSelection} idx={1} text={questionObj.options[1].text} clickedState={clickedOrNot ? "none" : ""} completed={currentSelected === 1 ? (questionObj.options[1].isCorrect ? true : false) : null} />
+            <Button bgColor={currentSelected === 2 ? (questionObj.options[2].isCorrect ? "green" : "red") : null} handleClick={updateUserSelection} idx={2} text={questionObj.options[2].text} clickedState={clickedOrNot ? "none" : ""} completed={currentSelected === 2 ? (questionObj.options[2].isCorrect ? true : false) : null} />
+            <Button bgColor={currentSelected === 3 ? (questionObj.options[3].isCorrect ? "green" : "red") : null} handleClick={updateUserSelection} idx={3} text={questionObj.options[3].text} clickedState={clickedOrNot ? "none" : ""} completed={currentSelected === 3 ? (questionObj.options[3].isCorrect ? true : false) : null} />
           </div>
+          <Timer width={currentTimer} />
         </>
+      ) : questionCount >= 10 ? (
+        <div id="tableContainer">
+          <table>
+            <thead>
+              <tr className="tableRow">
+                <th className="questionNum">Question No.</th>
+                <th className="choice">Choice</th>
+                <th className="correctAns">Correct Answer</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.values(qaStorage).map((ele, idx) => {
+                return <TableRow questionNum={idx + 1} choice={ele[1]} choiceColor={ele[0] ? "green" : "red"} correctChoice={ele[2]} />;
+              })}
+            </tbody>
+          </table>
+        </div>
       ) : (
         <h1>Loading...</h1>
       )}
