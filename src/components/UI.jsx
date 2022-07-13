@@ -138,11 +138,10 @@ function UI() {
 
   useEffect(() => {
     if (questionCount < 10) {
-      // eslint-disable-next-line
       timer.current = setInterval(() => {
         if (currentTimer > 0) setTimer((currentTimer) => currentTimer - 0.1);
       }, 100);
-      // eslint-disable-next-line
+
       timeOut.current = setTimeout(() => {
         clearInterval(timer);
         setClickedState(true);
@@ -157,6 +156,7 @@ function UI() {
       setTimer(5);
       setClickedState(() => false);
     };
+    // eslint-disable-next-line
   }, [questionIdx]);
 
   useEffect(() => {
