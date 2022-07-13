@@ -1,3 +1,6 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans&display=swap");
+
 * {
   margin: 0;
   padding: 0;
@@ -67,7 +70,6 @@
 
 .button {
   margin: 0px 10px;
-  /* height: 60px; */
   padding: 10px 20px;
 
   border: none;
@@ -100,13 +102,6 @@
 .questionNum {
   padding: 0px 7px;
   text-align: center;
-  /* border: 3px solid black; */
-}
-.choice {
-  /* border: 3px solid black; */
-}
-.correctAns {
-  /* border: 3px solid black; */
 }
 
 td {
