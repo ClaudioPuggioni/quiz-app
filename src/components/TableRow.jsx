@@ -1,7 +1,7 @@
 function TableRow(props) {
   return (
     <tr className="tableRow">
-      <td className="questionNum">{props.questionNum}</td>
+      <td className="questionTable">{props.questionTable}</td>
       <td className="choice" style={{ backgroundColor: props.choiceColor }}>
         {props.choice}
       </td>

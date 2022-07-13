@@ -137,7 +137,11 @@ function UI() {
   }, []);
 
   useEffect(() => {
-    if (questionCount < 10) {
+    console.log(QA.length, questionIdx);
+    console.log(questionObj);
+    console.log(questionCount);
+
+    if (questionCount <= 10) {
       timer.current = setInterval(() => {
         if (currentTimer > 0) setTimer((currentTimer) => currentTimer - 0.1);
       }, 100);
@@ -146,7 +150,7 @@ function UI() {
         clearInterval(timer);
         setClickedState(true);
         getRandomQuestion();
-        setQAStorage({ ...qaStorage, [questionCount]: [false, "Unanswered", QA[questionIdx][1]] });
+        setQAStorage({ ...qaStorage, [questionCount]: [false, "Unanswered", `${QA[questionIdx][0]}?`, QA[questionIdx][1]] });
       }, 5095);
     }
 
@@ -197,11 +201,9 @@ function UI() {
   function getRandomQuestion() {
     setQuestionCount((questionCount) => questionCount + 1);
     if (questionCount < 10) {
-      let randomIdx = Math.floor(Math.random() * 100);
+      let randomIdx = Math.floor(Math.random() * 99);
       setRandomQuestionIdx(randomIdx);
       populateTheObj(randomIdx);
-    } else {
-      console.log("done", questionCount);
     }
   }
 
@@ -214,9 +216,9 @@ function UI() {
       setSelected(i);
       if (questionObj.options[i].isCorrect && currentTimer > 0) {
         setNewScore((currentScore) => currentScore + 1);
-        setQAStorage({ ...qaStorage, [questionCount]: [true, questionObj.options[i].text, QA[questionIdx][1]] });
+        setQAStorage({ ...qaStorage, [questionCount]: [true, questionObj.options[i].text, `${QA[questionIdx][0]}?`, QA[questionIdx][1]] });
       } else if (!questionObj.options[i].isCorrect && currentTimer > 0) {
-        setQAStorage({ ...qaStorage, [questionCount]: [false, questionObj.options[i].text, QA[questionIdx][1]] });
+        setQAStorage({ ...qaStorage, [questionCount]: [false, questionObj.options[i].text, `${QA[questionIdx][0]}?`, QA[questionIdx][1]] });
       }
 
       setTimeout(() => {
@@ -247,14 +249,14 @@ function UI() {
           <table>
             <thead>
               <tr className="tableRow">
-                <th className="questionNum">Question No.</th>
+                <th className="questionTable">Question</th>
                 <th className="choice">Choice</th>
                 <th className="correctAns">Correct Answer</th>
               </tr>
             </thead>
             <tbody>
               {Object.values(qaStorage).map((ele, idx) => {
-                return <TableRow questionNum={idx + 1} choice={ele[1]} choiceColor={ele[0] ? "green" : "red"} correctChoice={ele[2]} />;
+                return <TableRow key={`query${idx + 1}`} choice={ele[1]} choiceColor={ele[0] ? "green" : "red"} questionTable={ele[2]} correctChoice={ele[3]} />;
               })}
             </tbody>
           </table>

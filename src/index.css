@@ -99,9 +99,8 @@
 .tableRow {
   font-family: poppins;
 }
-.questionNum {
+.questionTable {
   padding: 0px 7px;
-  text-align: center;
 }
 
 td {
